@@ -49,11 +49,11 @@ const connectDB = async () => {
 // app.use("/api/", funcName);
 // app.use("/api/", funcName);
 
-app.listen({ port: process.env.SERVER_PORT || 8080 }, () => {
+app.listen({ port: process.env.SERVER_PORT || 8083 }, () => {
     connectDB();
     const memoryUsage = process.memoryUsage();
     console.log(`-----------------------------------`);
-    console.info(`Emotions Layer is running on port ${process.env.SERVER_PORT || 8080}`);
+    console.info(`Thought Layer is running on port ${process.env.SERVER_PORT || 8083}`);
     console.info(`Heap Total: ${memoryUsage.heapTotal} - Heap Used: ${memoryUsage.heapUsed}`);
     console.log(`-----------------------------------`);
 });

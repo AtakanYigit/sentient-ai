@@ -37,7 +37,7 @@ async function setupAndRunDirectory(directory: string): Promise<void> {
     // await execPromise("npm install", { cwd: dirPath });
 
     // Run TypeScript file directly using ts-node
-    console.log(`▶️ Starting ${directory}...`);
+    console.log(`🚀 Starting ${directory}...`);
     await runCommand("npm run dev ", dirPath, directory);
 }
 
@@ -59,4 +59,4 @@ async function main(): Promise<void> {
     await Promise.all(directories.map(setupAndRunDirectory));
 }
 
-main().catch(console.error); 
+main().catch(console.error);
