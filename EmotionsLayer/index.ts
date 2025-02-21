@@ -1,8 +1,11 @@
+// import "reflect-metadata"
 import express, {Express}   from "express";
-// import {DB}                 from "./src/config/database";
+import {DB}                 from "./src/config/database";
 import cors                 from "cors";
 
 //Routes
+import emotionsRoutes       from "./src/routes/emotions.routes";
+import hormonesRoutes       from "./src/routes/hormones.routes";
 // import authRoutes                from "./src/routes/auth.routes";
 
 require("dotenv").config();
@@ -37,8 +40,8 @@ console.log("Emotions Layer Started");
 // Database Connection
 const connectDB = async () => {
     try {
-        // await DB.initialize();
-        // console.log("Database connected successfully");
+        await DB.initialize();
+        console.log("Database connected successfully");
     } catch (error) {
         console.error("Unable to connect to the database:", error);
         process.exit(1);
@@ -46,8 +49,8 @@ const connectDB = async () => {
 };
 
 // Routes
-// app.use("/api/", funcName);
-// app.use("/api/", funcName);
+app.use("/api/emotions", emotionsRoutes);
+app.use("/api/hormones", hormonesRoutes);
 
 app.listen({ port: process.env.SERVER_PORT || 8084 }, () => {
     connectDB();
