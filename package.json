@@ -1,0 +1,27 @@
+{
+    "name": "sentient-ai",
+    "version": "1.0.0",
+    "description": "Trying to simulate consciousness using a basic brain simulation and LLMs.",
+    "main": "startSentientAi.ts",
+    "scripts": {
+        "start": "node startSentientAi.ts",
+        "dev": "nodemon --exec ts-node startSentientAi.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/AtakanYigit/sentient-ai.git"
+    },
+    "author": "Atakan Yigit Cengeloglu",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/AtakanYigit/sentient-ai/issues"
+    },
+    "homepage": "https://github.com/AtakanYigit/sentient-ai#readme",
+    "devDependencies": {
+        "@types/node": "^22.13.4",
+        "nodemon": "^3.1.9",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3",
+        "dotenv": "^16.4.7"
+    }
+}

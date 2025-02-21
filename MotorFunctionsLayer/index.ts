@@ -8,6 +8,8 @@ import cors                 from "cors";
 require("dotenv").config();
 const app: Express = express();
 
+console.log("Motor Functions Layer Started");
+
 // const corsOptions = {
 //     origin: process.env.NODE_ENV === "production" 
 //         ? `https://${process.env.DOMAIN}`
