@@ -15,10 +15,6 @@ export const SpeechService = {
             console.log(voices);
             // For break <break time="1s" /> or ----
 
-            // const fierceVoice  = "nDJIICjR9zfJExIFeSCN";
-            // const whisperVoice = "nbk2esDn4RRk4cVDdoiE";
-            // const naturalVoice = "qXdtsJJ9LgnQ8Z2TYfav";
-
             const fierceVoice  = "Emmaline - young British girl";
             const whisperVoice = "Alice - ASMR British Whisper";
             const naturalVoice = "Lily";
