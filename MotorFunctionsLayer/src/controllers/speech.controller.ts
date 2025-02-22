@@ -5,9 +5,8 @@ export const SpeechController = {
     speak: async (req: Request, res: Response) => {
         try {
             const text = req?.body?.text;
-            console.log(text);
-            console.log(req.body);
-            const result = await SpeechService.speak(text);
+            const emotion = req?.body?.emotion;
+            const result = await SpeechService.speak(text, emotion);
             res.status(200).json(result);
         } catch (error) {
             res.status(500).json({message: "Error fetching speech"});
