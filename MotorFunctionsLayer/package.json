@@ -11,13 +11,18 @@
     "license": "ISC",
     "dependencies": {
         "cors": "^2.8.5",
-        "express": "^4.21.2"
+        "elevenlabs": "^1.51.0",
+        "express": "^4.21.2",
+        "pg": "^8.13.3",
+        "reflect-metadata": "^0.2.2",
+        "say": "^0.16.0",
+        "typeorm": "^0.3.20"
     },
     "devDependencies": {
         "@types/node": "^22.13.4",
+        "dotenv": "^16.4.7",
         "nodemon": "^3.1.9",
         "ts-node": "^10.9.2",
-        "typescript": "^5.7.3",
-        "dotenv": "^16.4.7"
+        "typescript": "^5.7.3"
     }
 }
