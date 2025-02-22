@@ -15,12 +15,10 @@ export const SpeechService = {
             //
 
             
-            const testText = `"You're leaving?" \n <break time="1s" /> \n "That's it!!"`
             const audio = await elevenlabs.generate({
                 model_id: "eleven_flash_v2_5",
                 voice: "pFZP5JQG7iQjIQuC4Bku",
-                text: testText,
-                // text: text,
+                text: text,
             });
 
             await play(audio);
