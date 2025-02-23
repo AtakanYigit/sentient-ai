@@ -101,12 +101,10 @@ const fetchAndProcessContext = async () => {
     }
 };
 
-// Start the loop
-const startContextMonitoring = () => {
+const init = () => {
     fetchAndProcessContext();
 
     setInterval(fetchAndProcessContext, 30000);
 };
 
-// Initialize the monitoring
-startContextMonitoring();
+init();
