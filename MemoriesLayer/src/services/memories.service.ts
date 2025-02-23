@@ -34,7 +34,7 @@ export const MemoriesService = {
             const vitals = await vitalsRepository.find();
 
             const context = await contextRepository.findOne({
-                where: { createdAt: new Date(Date.now() - 60000).toISOString()},
+                where: { createdAt: new Date(Date.now() - 60000) },
                 order: { createdAt: "DESC" },
             });
 

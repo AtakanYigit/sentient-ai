@@ -1,7 +1,7 @@
 import { Column, Entity, Index } from "typeorm";
 
 @Index("Hormones_pkey", ["id"], { unique: true })
-@Entity("Hormones", { schema: "public" })
+@Entity("hormones", { schema: "public" })
 export class Hormones {
   @Column("uuid", {
     primary: true,

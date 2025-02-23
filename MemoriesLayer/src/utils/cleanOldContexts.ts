@@ -9,7 +9,7 @@ export const cleanOldContexts = async () => {
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         
         await contextRepository.delete({
-            createdAt: LessThan(fiveMinutesAgo.toISOString())
+            createdAt: LessThan(fiveMinutesAgo)
         });
         
         console.log("Cleaned contexts older than 5 minutes");

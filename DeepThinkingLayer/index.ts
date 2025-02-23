@@ -20,7 +20,7 @@ const fetchAndProcessContext = async () => {
 
         // Get the context from database
         const prevContext = await contextRepository.findOne({
-            where: { createdAt: new Date(Date.now() - 60000).toISOString()},
+            where: { createdAt: new Date(Date.now() - 60000) },
             order: { createdAt: "DESC" },
         });
 
