@@ -16,7 +16,8 @@
         "openai": "^4.85.3",
         "pg": "^8.13.3",
         "reflect-metadata": "^0.2.2",
-        "typeorm": "^0.3.20"
+        "typeorm": "^0.3.20",
+        "zod": "^3.24.2"
     },
     "devDependencies": {
         "@types/node": "^22.13.4",
