@@ -132,7 +132,8 @@ export const MemoriesService = {
     },
     getLongTermMemory: async () => {
         try {
-            return { success: true };
+            const longTermMemories = await longTermMemoriesRepository.find();
+            return { success: true, longTermMemories };
         } catch (error) {
             console.log(error);
             return { success: false };
@@ -140,7 +141,8 @@ export const MemoriesService = {
     },
     getShortTermMemory: async () => {
         try {
-            return { success: true };
+            const shortTermMemories = await shortTermMemoriesRepository.find();
+            return { success: true, shortTermMemories };
         } catch (error) {
             console.log(error);
             return { success: false };
