@@ -25,9 +25,18 @@ export class LongTermMemories {
   })
   lastAccessed: Date;
 
-  @Column("integer", { name: "totall_accesses", default: () => "0" })
-  totallAccesses: number;
+  @Column("integer", { name: "total_accesses", default: () => "0" })
+  totalAccesses: number;
 
   @Column("integer", { name: "levelOfImportance" })
   levelOfImportance: number;
+
+  @Column("time with time zone", {
+    name: "last_checked",
+    default: () => "CURRENT_TIMESTAMP",
+  })
+  lastChecked: string;
+
+  @Column("integer", { name: "total_accesses_last", default: () => "0" })
+  totalAccessesLast: number;
 }
