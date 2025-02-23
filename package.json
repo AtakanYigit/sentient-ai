@@ -4,8 +4,8 @@
     "description": "Trying to simulate consciousness using a basic brain simulation and LLMs.",
     "main": "startSentientAi.ts",
     "scripts": {
-        "start": "node startSentientAi.ts",
-        "dev": "nodemon --exec ts-node startSentientAi.ts"
+        "sentient": "npx concurrently --kill-others \"cd AutomaticBehaivorsLayer && npm i && npm run dev\" \"cd ConsciousLayer && npm i && npm run dev\" \"cd DeepThinkingLayer && npm i && npm run dev\" \"cd EmotionsLayer && npm i && npm run dev\" \"cd MemoriesLayer && npm i && npm run dev\" \"cd MotorFunctionsLayer && npm i && npm run dev\" \"cd SensesLayer && npm i && npm run dev\" \"cd ThoughtLayer && npm i && npm run dev\"",
+        "dev": "npx concurrently --kill-others \"cd AutomaticBehaivorsLayer && npm run dev\" \"cd ConsciousLayer && npm run dev\" \"cd DeepThinkingLayer && npm run dev\" \"cd EmotionsLayer && npm run dev\" \"cd MemoriesLayer && npm run dev\" \"cd MotorFunctionsLayer && npm run dev\" \"cd SensesLayer && npm run dev\" \"cd ThoughtLayer && npm run dev\""
     },
     "repository": {
         "type": "git",

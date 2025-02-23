@@ -27,6 +27,7 @@ const hearAndProcess = async () => {
     const languageCode    = "en-US";
     const threshold       = 0;
     const silence         = "1.0";
+    const verbose         = false;
 
 
     const request = {
@@ -54,7 +55,8 @@ const hearAndProcess = async () => {
         sampleRateHertz:    sampleRateHertz,
         threshold:          threshold,
         silence:            silence,
-        recordProgram:      "sox"
+        recordProgram:      "sox",
+        verbose:            verbose
     };
 
     try {
@@ -80,7 +82,7 @@ const hearAndProcess = async () => {
 
 const seeAndProcess = async () => {
     console.log("Starting seeing...");
-
+    
     console.log("I have no eyes yet...");    
 }
 
