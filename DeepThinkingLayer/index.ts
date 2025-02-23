@@ -110,4 +110,3 @@ const startContextMonitoring = () => {
 
 // Initialize the monitoring
 startContextMonitoring();
-
