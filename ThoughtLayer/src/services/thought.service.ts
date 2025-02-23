@@ -74,7 +74,7 @@ export const ThoughtService = {
             return { success: false };
         }
     },
-    possibleOutcomes: async ({recievedPrompt, answerLength = "Short", context = "No context provided"}: {recievedPrompt: string, answerLength: string, context: string}) => {
+    possibleOutcomes: async ({recievedPrompt, context = "No context provided"}: {recievedPrompt: string, context: string}) => {
         try {
             const openai = new OpenAI({
                 baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
@@ -98,7 +98,6 @@ export const ThoughtService = {
             const prompt = `
                 You are the thinking layer of the brain and other layers are providing you with:
                 - A prompt
-                - Answer length
                 - A context(optional)
                 - A list of currently most intense emotions you are feeling, and intensity of each emotion.
 
@@ -173,7 +172,6 @@ export const ThoughtService = {
 
                 Here is the current situation:
                 You are feeling ${emotions.map((emotion: any) => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10,`).join(" and ")}
-                Answer length: ${answerLength}.
                 Context: ${context}.
                 Prompt you need to answer: ${recievedPrompt}
             `;
@@ -189,7 +187,6 @@ export const ThoughtService = {
                 response_format: zodResponseFormat(schema, "json_schema")
             });
 
-            // console.log(response.choices[0].message);
             const jsonResponse = JSON.parse(response.choices[0].message.content);
 
             return { success: true, response: jsonResponse };
