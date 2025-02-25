@@ -1,4 +1,4 @@
-# sentient-ai
+# Sentient AI
 This project explores the possibility of achieving consciousness through a fundamental brain simulation that integrates large language models (LLMs). The goal is to investigate whether replicating certain aspects of brain activity, alongside the use of LLMs, can lead to the emergence of conscious experience.
 
 ## Required: 
