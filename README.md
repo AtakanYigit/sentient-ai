@@ -3,7 +3,7 @@ This project explores the possibility of achieving consciousness through a funda
 
 ## Required: 
 - [Node.js](https://nodejs.org/en/download)
-- [Sox](https://sourceforge.net/projects/sox/files/sox/14.4.1/)
+- [Sox](https://sourceforge.net/projects/sox/files/sox/14.4.1/) (14.4.1 suggested)
 - [LM Studio](https://lmstudio.ai/ "LM Studio") with an AI model. I suggest DeepSeek R1.
 
 ## How to Install?
@@ -15,3 +15,22 @@ lms server start
 ```bash
 npm run sentient
 ```
+
+## Layers Explained
+
+### Deep Thinking Layer
+
+### Thought Layer Layer
+
+### Memories Layer
+
+### Reflexes and Automatic Behaivours Layer
+
+### Emotions Layer
+
+### Senses Layer
+
+### Motor FunctionsLayer
+
+### Conscious Layer (Decision Making Layer)
+
