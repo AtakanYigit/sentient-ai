@@ -31,14 +31,16 @@ Memories Layer is where all the memories are handled. It consists of two parts. 
 - Long-term memory is expensive. Memories in this layer has 3 levels of importance (1: not very important - 3: very important). If a memory is not accessed frequently it loses importance level and if level reaches 0 it is removed from long-term memory.
 
 ### Reflexes and Automatic Behaivours Layer
-
+Reflexes and Automatic Behaivours Layer handles the background work for vitals. Kind of like the Deep Thinking Layer but mostly works for the more emergency situations. Unlike Deep Thinking Layer this layer can take actions or change results of other actions.
 
 ### Emotions Layer
 Emotions Layer stores and manages hormones. Also by looking at the hormonal values determines current closest emotions and provides other layers with that data.
 
 ### Senses Layer
+Senses Layer is handles the incoming data. This includes hearing (Speech to Text), temperature monitoring, seeing and other sensory related stuff.
 
 ### Motor FunctionsLayer
+Motor Functions Layer is responsible for physical actions of the model. This includes speaking (Text to Speech), moving, turning and more.
 
 ### Conscious Layer (Decision Making Layer)
-
+Conscious Layer is the main decision making layer. It can ask other layers for information but that is this layer's job to decide on the action. It doesn't think on its own, it only uses other layers.
