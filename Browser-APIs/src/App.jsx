@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-function App() {
+require("dotenv").config({ path: '../.env' });
+
+const App = () => {
+    console.log("Browser-APIs Started");
+    
     const videoRef  = useRef(null);
     const canvasRef = useRef(null);
     const [error,           setError]          = useState(null);
@@ -100,7 +104,7 @@ function App() {
                 formData.append("image", blob);
                 
                 // Send to server
-                await axios.post("http://localhost:8085/api/senses", formData, {
+                await axios.post(`http://localhost:${process.env.SENSES_LAYER_PORT}/api/senses`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },

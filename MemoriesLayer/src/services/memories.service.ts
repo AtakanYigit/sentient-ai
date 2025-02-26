@@ -1,6 +1,6 @@
-import OpenAI from "openai";
-import axios  from "axios";
-import {z}    from "zod";
+import OpenAI              from "openai";
+import axios               from "axios";
+import {z}                 from "zod";
 import {zodResponseFormat} from "openai/helpers/zod";
 import {DB}                from "../config/database";
 import {Vitals}            from "../entities/Vitals";
@@ -8,10 +8,12 @@ import {Context}           from "../entities/Context";
 import {LongTermMemories}  from "../entities/LongTermMemories";
 import {ShortTermMemories} from "../entities/ShortTermMemories";
 
-const longTermMemoriesRepository = DB.getRepository(LongTermMemories);
+const longTermMemoriesRepository  = DB.getRepository(LongTermMemories);
 const shortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
-const vitalsRepository = DB.getRepository(Vitals);
-const contextRepository = DB.getRepository(Context);
+const vitalsRepository            = DB.getRepository(Vitals);
+const contextRepository           = DB.getRepository(Context);
+
+require("dotenv").config({ path: '../.env' });
 
 const openai = new OpenAI({
     baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
@@ -27,7 +29,7 @@ export const MemoriesService = {
                 levelOfImportance: z.number().min(1).max(3),
             });
             
-            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_SERVER_PORT}/api/emotions`);
+            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
             let emotions = emotionsResponse.data.sort((a: any, b: any) => a.distance - b.distance);
                 emotions = emotions.slice(0, 3);
 

@@ -2,6 +2,8 @@
 
 import { ElevenLabsClient, play, stream } from "elevenlabs";
 
+require("dotenv").config({ path: '../.env' });
+
 // const speechRepository = DB.getRepository(Speech);
 
 export const SpeechService = {
@@ -11,8 +13,6 @@ export const SpeechService = {
                 apiKey: process.env.ELEVENLABS_API_KEY,
             });
 
-            const voices = await elevenlabs.voices.getAll();
-            console.log(voices);
             // For break <break time="1s" /> or ----
 
             const fierceVoice  = "Emmaline - young British girl";
@@ -29,8 +29,6 @@ export const SpeechService = {
             } else {
                 voice = naturalVoice;
             }
-
-            console.log(voice);
 
             const audio = await elevenlabs.generate({
                 // model_id: "eleven_flash_v2_5",

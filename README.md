@@ -18,6 +18,10 @@ Load your model in LM Studio
 npm run sentient
 ```
 
+Adjust create your .env file according to .env.Example provided.
+
+For vision open 'http://localhost:5173/' in your browser and select the right camera source.
+
 ## Layers Explained
 
 ### Deep Thinking Layer

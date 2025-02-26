@@ -11,7 +11,7 @@ export const ThoughtService = {
                 apiKey: "not-needed"
             });
 
-            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_SERVER_PORT}/api/emotions`);
+            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
             let emotions = emotionsResponse.data.sort((a: any, b: any) => a.distance - b.distance);
                 emotions = emotions.slice(0, 3);
 
@@ -81,7 +81,7 @@ export const ThoughtService = {
                 apiKey: "not-needed"
             });
 
-            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_SERVER_PORT}/api/emotions`);
+            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
             let emotions = emotionsResponse.data.sort((a: any, b: any) => a.distance - b.distance);
                 emotions = emotions.slice(0, 3);
 

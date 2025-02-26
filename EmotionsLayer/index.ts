@@ -1,47 +1,18 @@
 // import "reflect-metadata"
 import express, {Express}   from "express";
 import {DB}                 from "./src/config/database";
-import cors                 from "cors";
 
 //Routes
 import emotionsRoutes       from "./src/routes/emotions.routes";
 import hormonesRoutes       from "./src/routes/hormones.routes";
-// import authRoutes                from "./src/routes/auth.routes";
 
-require("dotenv").config();
+require("dotenv").config({ path: '../.env' });
 const app: Express = express();
-
-console.log("Emotions Layer Started");
-
-// const corsOptions = {
-//     origin: process.env.NODE_ENV === "production" 
-//         ? `https://${process.env.DOMAIN}`
-//         : ["http://localhost:3000", "http://localhost:3001"], 
-//     methods: "GET, POST, PUT, PATCH, DELETE",
-//     allowedHeaders: [
-//         "Content-Type",
-//         "Authorization",
-//         "Accept",
-//         "Content-Disposition"
-//     ],
-//     exposedHeaders: [
-//         "Content-Type",
-//         "Authorization",
-//         "Content-Disposition"
-//     ],
-//     credentials: true
-// };
-
-// Middleware
-// app.use(express.json());
-// app.use(cors(corsOptions));
-// app.use(express.urlencoded({ extended: true }));
 
 // Database Connection
 const connectDB = async () => {
     try {
         await DB.initialize();
-        console.log("Database connected successfully");
     } catch (error) {
         console.error("Unable to connect to the database:", error);
         process.exit(1);
@@ -52,11 +23,7 @@ const connectDB = async () => {
 app.use("/api/emotions", emotionsRoutes);
 app.use("/api/hormones", hormonesRoutes);
 
-app.listen({ port: process.env.SERVER_PORT || 8084 }, () => {
+app.listen({ port: process.env.EMOTIONS_LAYER_PORT }, () => {
     connectDB();
-    const memoryUsage = process.memoryUsage();
-    console.log(`-----------------------------------`);
-    console.info(`Emotions Layer is running on port ${process.env.SERVER_PORT || 8084}`);
-    console.info(`Heap Total: ${memoryUsage.heapTotal} - Heap Used: ${memoryUsage.heapUsed}`);
-    console.log(`-----------------------------------`);
+    console.info(`Emotions Layer Started. Running on port ${process.env.EMOTIONS_LAYER_PORT}`);
 });

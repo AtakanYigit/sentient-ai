@@ -9,6 +9,10 @@ const vitalsRepository = DB.getRepository(Vitals);
 const contextRepository = DB.getRepository(Context);
 const pastVisionsRepository = DB.getRepository(PastVisions);
 
+require("dotenv").config({ path: '../.env' });
+
+console.log("Deep Thinking Layer Started");
+
 const openai = new OpenAI({
     baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
     apiKey: "not-needed"
@@ -35,7 +39,7 @@ const fetchAndProcessContext = async () => {
             
             vitalsRepository.find(),
             
-            axios.get<Array<{ name: string; distance: number }>>(`http://localhost:${process.env.EMOTIONS_SERVER_PORT}/api/emotions`)
+            axios.get<Array<{ name: string; distance: number }>>(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`)
         ]);
 
         // Process emotions data
@@ -94,11 +98,15 @@ const fetchAndProcessContext = async () => {
             messages: [{ role: "user", content: prompt.trim() }],
         });
 
-        const newContext = new Context();
-        newContext.context = response.choices[0].message.content;
-        await contextRepository.save(newContext);
+        if(response?.choices[0]?.message?.content) {
+            const newContext = new Context();
+            newContext.context = response.choices[0].message.content;
+            await contextRepository.save(newContext);
 
-        console.log("API Response:", response.choices[0].message.content);
+            console.log("API Response:", response.choices[0].message.content);
+        } else {
+            console.error("No response from OpenAI");
+        }
     } catch (error) {
         console.error("Error in context processing:", error instanceof Error ? error.message : "Unknown error");
         throw error; // Re-throw to handle it in the caller if needed

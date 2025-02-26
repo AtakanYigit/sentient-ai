@@ -8,6 +8,8 @@ import sendActionToMemoryLayer  from "../utils/sendActionTomemoryLayer";
 import {PastVisions}            from "../entities/PastVisions";
 // import {Context}               from "../entities/Context";
 
+require("dotenv").config({ path: '../.env' });
+
 // const contextRepository = DB.getRepository(Context);
 const pastVisionsRepository = DB.getRepository(PastVisions);
 
@@ -16,7 +18,7 @@ const openai = new OpenAI({
     apiKey: "not-needed"
 });
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY);
 const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
 
 export const SensesService = {

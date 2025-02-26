@@ -1,3 +1,14 @@
+import {OpenAI}            from "openai";
+import {DB}                from "./config/database";
+import {Context}           from "./src/entities/Context";
+import {Vitals}            from "./src/entities/Vitals";
+import axios               from "axios";
+
+const vitalsRepository = DB.getRepository(Vitals);
+const contextRepository = DB.getRepository(Context);
+
+require("dotenv").config({ path: '../.env' });
+
 console.log("Conscious Layer Started");
 
 const actions = [
@@ -7,15 +18,6 @@ const actions = [
     "",
     "",
 ];
-
-import {OpenAI}            from "openai";
-import {DB}                from "./config/database";
-import {Context}           from "./src/entities/Context";
-import {Vitals}            from "./src/entities/Vitals";
-import axios               from "axios";
-
-const vitalsRepository = DB.getRepository(Vitals);
-const contextRepository = DB.getRepository(Context);
 
 const openai = new OpenAI({
     baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,

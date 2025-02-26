@@ -1,5 +1,3 @@
-console.log("Senses Layer Started");
-
 import express, {Express} from "express";
 import {DB}               from "./src/config/database";
 import cors               from "cors";
@@ -8,7 +6,7 @@ import hearAndProcess     from "./src/utils/hearAndProcess";
 //Routes
 import sensesRoutes       from "./src/routes/senses.routes";
 
-require("dotenv").config();
+require("dotenv").config({ path: '../.env' });
 const app: Express = express();
 
 const corsOptions = {
@@ -33,7 +31,6 @@ app.use(cors(corsOptions));
 const connectDB = async () => {
     try {
         await DB.initialize();
-        console.log("Database connected successfully");
     } catch (error) {
         console.error("Unable to connect to the database:", error);
         process.exit(1);
@@ -43,13 +40,9 @@ const connectDB = async () => {
 // Routes
 app.use("/api/senses", sensesRoutes);
 
-app.listen({ port: process.env.SENSES_SERVER_PORT || 8085 }, () => {
+app.listen({ port: process.env.SENSES_LAYER_PORT }, () => {
     connectDB();
-    const memoryUsage = process.memoryUsage();
-    console.log(`-----------------------------------`);
-    console.info(`Senses Layer is running on port ${process.env.SENSES_SERVER_PORT || 8085}`);
-    console.info(`Heap Total: ${memoryUsage.heapTotal} - Heap Used: ${memoryUsage.heapUsed}`);
-    console.log(`-----------------------------------`);
+    console.info(`Senses Layer Started. Running on port ${process.env.SENSES_LAYER_PORT}`);
 
     // Continuous Listening
     // hearAndProcess();
