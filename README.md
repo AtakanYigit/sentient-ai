@@ -12,6 +12,8 @@ run:
 lms server start
 ```
 
+Load your model in LM Studio
+
 ```bash
 npm run sentient
 ```

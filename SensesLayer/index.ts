@@ -1,107 +1,56 @@
 console.log("Senses Layer Started");
 
-import {DB} from "./config/database";
-import axios from "axios";
-import speech from "@google-cloud/speech";
-import recorder from "node-record-lpcm16";
+import express, {Express} from "express";
+import {DB}               from "./src/config/database";
+import cors               from "cors";
+import hearAndProcess     from "./src/utils/hearAndProcess";
 
-const sendActionToMemoryLayer = async (action: string) => {
+//Routes
+import sensesRoutes       from "./src/routes/senses.routes";
+
+require("dotenv").config();
+const app: Express = express();
+
+const corsOptions = {
+    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:5173"], 
+    methods: "GET, POST, PUT, PATCH, DELETE",
+    allowedHeaders: [
+        "Content-Type",
+        "Accept",
+        "Content-Disposition"
+    ],
+    exposedHeaders: [
+        "Content-Type",
+        "Content-Disposition"
+    ]
+};
+
+// Middleware
+app.use(express.json());
+app.use(cors(corsOptions));
+
+// Database Connection
+const connectDB = async () => {
     try {
-        const response = await axios.post(`http://localhost:${process.env.MEMORIES_LAYER_PORT}/api/`, {action: action});
-
-        console.log(response.data);
+        await DB.initialize();
+        console.log("Database connected successfully");
     } catch (error) {
-        console.error("Error sending action to memory layer:", error);
+        console.error("Unable to connect to the database:", error);
+        process.exit(1);
     }
 };
 
-const hearAndProcess = async () => {
-    // Creates a client with explicit credentials
-    const client = new speech.SpeechClient({
-        keyFilename: "./sentientai-451816-ef9255a68ccf.json",
-    });
+// Routes
+app.use("/api/senses", sensesRoutes);
 
-    // Configuration
-    const encoding        = "LINEAR16";
-    const sampleRateHertz = 16000;
-    const languageCode    = "en-US";
-    const threshold       = 0;
-    const silence         = "1.0";
-    const verbose         = false;
+app.listen({ port: process.env.SENSES_SERVER_PORT || 8085 }, () => {
+    connectDB();
+    const memoryUsage = process.memoryUsage();
+    console.log(`-----------------------------------`);
+    console.info(`Senses Layer is running on port ${process.env.SENSES_SERVER_PORT || 8085}`);
+    console.info(`Heap Total: ${memoryUsage.heapTotal} - Heap Used: ${memoryUsage.heapUsed}`);
+    console.log(`-----------------------------------`);
 
-
-    const request = {
-        config: {
-            encoding: encoding,
-            sampleRateHertz: sampleRateHertz,
-            languageCode: languageCode,
-        },
-        interimResults: false,
-    };
-
-    // Create a recognize stream
-    const recognizeStream = client
-        .streamingRecognize(request as any)
-        .on("error", (error) => {console.error("Error in recognition stream:", error);})
-        .on("data", (data: any) => {
-            if (data.results[0] && data.results[0].alternatives[0]) {
-                const transcription = data.results[0].alternatives[0].transcript;
-                sendActionToMemoryLayer(`I heard: ${transcription}`);
-            }
-        });
-
-    // Try different recording programs
-    const recordingOptions = {
-        sampleRateHertz:    sampleRateHertz,
-        threshold:          threshold,
-        silence:            silence,
-        recordProgram:      "sox",
-        verbose:            verbose
-    };
-
-    try {
-        console.log("Starting hearing...");
-        recorder
-            .record(recordingOptions)
-            .stream()
-            .on("error", (error) => {
-                console.error("Error in recording stream:", error);
-                // Try alternative recording program if first one fails
-                recordingOptions.recordProgram = "sox";
-                recorder
-                    .record(recordingOptions)
-                    .stream()
-                    .on("error", (error) => {console.error("Error with alternative recording program:", error);})
-                    .pipe(recognizeStream);
-            })
-            .pipe(recognizeStream);
-    } catch (error) {
-        console.error("Failed to start hearing:", error);
-    }
-};
-
-const seeAndProcess = async () => {
-    console.log("Starting seeing...");
-    
-    console.log("I have no eyes yet...");    
-}
-
-// Start the loop
-const init = async () => {
-    if (!DB.isInitialized) await DB.initialize();
-
-    // Start listening
-    await hearAndProcess();
-
-    // Start Seeing
-    await seeAndProcess();
-
-    // Start Temperature Monitoring
-    // await monitorTemperature();
-
-    
-    // setInterval(seeAndProcess, 30000);
-};
-
-// Initialize
-init();
+    // Continuous Listening
+    // hearAndProcess();
+});

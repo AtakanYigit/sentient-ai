@@ -2,10 +2,12 @@ import {OpenAI}            from "openai";
 import {DB}                from "./config/database";
 import {Context}           from "./src/entities/Context";
 import {Vitals}            from "./src/entities/Vitals";
+import {PastVisions}       from "./src/entities/PastVisions";
 import axios               from "axios";
 
 const vitalsRepository = DB.getRepository(Vitals);
 const contextRepository = DB.getRepository(Context);
+const pastVisionsRepository = DB.getRepository(PastVisions);
 
 const openai = new OpenAI({
     baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
@@ -14,25 +16,34 @@ const openai = new OpenAI({
 
 const fetchAndProcessContext = async () => {
     try {
+        // Initialize DB only if needed
         if (!DB.isInitialized) {
             await DB.initialize();
         }
 
-        // Get the context from database
-        const prevContext = await contextRepository.findOne({
-            where: { createdAt: new Date(Date.now() - 60000) },
-            order: { createdAt: "DESC" },
-        });
+        // Fetch all data in parallel
+        const [prevContext, lastVision, vitals, emotionsResponse] = await Promise.all([
+            contextRepository.findOne({
+                where: { createdAt: new Date(Date.now() - 60000) },
+                order: { createdAt: "DESC" },
+            }),
+            
+            pastVisionsRepository.findOne({
+                where: { createdAt: new Date(Date.now() - 60000) },
+                order: { createdAt: "DESC" },
+            }),
+            
+            vitalsRepository.find(),
+            
+            axios.get<Array<{ name: string; distance: number }>>(`http://localhost:${process.env.EMOTIONS_SERVER_PORT}/api/emotions`)
+        ]);
 
-        const vitals = await vitalsRepository.find();
-        const visual = null;
-        const audio = null;
-        const latestAction = null;
-        const latestInteractions = null;
+        // Process emotions data
+        const emotions = emotionsResponse?.data?.sort((a, b) => a.distance - b.distance).slice(0, 3);
 
-        let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_SERVER_PORT}/api/emotions`);
-        let emotions = emotionsResponse?.data?.sort((a: any, b: any) => a.distance - b.distance);
-            emotions = emotions?.slice(0, 3);
+        if (!emotions) {
+            throw new Error("Failed to fetch emotions data");
+        }
 
         const prompt = `
             You are the deep thinking layer of the brain and you are provided with:
@@ -72,23 +83,15 @@ const fetchAndProcessContext = async () => {
             Answer: I take a sip of my coffee and continue writing in my notebook. The library is peaceful, making it easy to concentrate. I feel more confident about the material I am studying. A librarian walks by, quietly organizing books on a nearby shelf.
 
             Now provide your answer.
-            Your vital values: ${vitals.map((vital: any) => `${vital.name}: ${vital.value}/100,`).join(" and ")}.
-            You are feeling ${emotions.map((emotion: any) => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10,`).join(" and ")}.
-            Previous context: ${prevContext?.context}
-            ${visual ? `Visual: ${visual}` : ""}
-            ${audio ? `Audio: ${audio}` : ""}
-            ${latestAction ? `Latest action: ${latestAction}` : ""}
-            ${latestInteractions ? `Latest interactions: ${latestInteractions}` : ""}
+            Your vital values: ${vitals.map(vital => `${vital.name}: ${vital.level}/100`).join(", ")}.
+            You are feeling ${emotions.map(emotion => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10`).join(", ")}.
+            Previous context: ${prevContext?.context ?? "No previous context available"}
+            ${lastVision ? `Last vision: ${lastVision.vision}` : ""}
         `;
 
         const response = await openai.chat.completions.create({
             model: "local-model",
-            messages: [
-                { 
-                    role: "user", 
-                    content: prompt,
-                }
-            ],
+            messages: [{ role: "user", content: prompt.trim() }],
         });
 
         const newContext = new Context();
@@ -97,7 +100,8 @@ const fetchAndProcessContext = async () => {
 
         console.log("API Response:", response.choices[0].message.content);
     } catch (error) {
-        console.error("Error in context processing:", error);
+        console.error("Error in context processing:", error instanceof Error ? error.message : "Unknown error");
+        throw error; // Re-throw to handle it in the caller if needed
     }
 };
 
