@@ -40,9 +40,9 @@ Memories Layer is where all the memories are handled. It consists of two parts. 
 Reflexes and Automatic Behaivours Layer handles the background work for vitals. Kind of like the Deep Thinking Layer but mostly works for the more emergency situations. Unlike Deep Thinking Layer this layer can take actions or change results of other actions.
 
 ### Emotions Layer
-Emotions Layer stores and manages hormones. Also by looking at the hormonal values determines current closest emotions and provides other layers with that data.
-- Currently Supported Hormones: Dopamine, serotonin, oxytocin, endorphins, cortisol, adrenaline, noradrenaline, testosterone.
-- Currently Supported Emotions: Bored, Surprised, Neutral, Curious, Embarrassed, Shamed, Guilty, Loneliness, Jealous, Frustrated, Grateful, Awe.
+Emotions Layer stores and manages hormones. Also by looking at the hormonal values determines current closest emotions and provides other layers with that data.  
+**Currently Supported Hormones:** Dopamine, serotonin, oxytocin, endorphins, cortisol, adrenaline, noradrenaline, testosterone.  
+**Currently Supported Emotions:** Bored, Surprised, Neutral, Curious, Embarrassed, Shamed, Guilty, Loneliness, Jealous, Frustrated, Grateful, Awe.  
 
 ### Senses Layer
 Senses Layer is handles the incoming data. This includes hearing (Speech to Text), temperature monitoring, seeing and other sensory related stuff.
