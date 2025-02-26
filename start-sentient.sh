@@ -6,4 +6,5 @@ npx concurrently \
   "cd MemoriesLayer && npm i && npm run dev" \
   "cd MotorFunctionsLayer && npm i && npm run dev" \
   "cd SensesLayer && npm i && npm run dev" \
-  "cd ThoughtLayer && npm i && npm run dev"
+  "cd ThoughtLayer && npm i && npm run dev" \
+  "cd Browser-APIs && npm i && npm run dev"
