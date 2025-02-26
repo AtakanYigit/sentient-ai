@@ -41,8 +41,8 @@ Reflexes and Automatic Behaivours Layer handles the background work for vitals. 
 
 ### Emotions Layer
 Emotions Layer stores and manages hormones. Also by looking at the hormonal values determines current closest emotions and provides other layers with that data.
-Currently Supported Hormones: Dopamine, serotonin, oxytocin, endorphins, cortisol, adrenaline, noradrenaline, testosterone.
-Currently Supported Emotions: Bored, Surprised, Neutral, Curious, Embarrassed, Shamed, Guilty, Loneliness, Jealous, Frustrated, Grateful, Awe.
+- Currently Supported Hormones: Dopamine, serotonin, oxytocin, endorphins, cortisol, adrenaline, noradrenaline, testosterone.
+- Currently Supported Emotions: Bored, Surprised, Neutral, Curious, Embarrassed, Shamed, Guilty, Loneliness, Jealous, Frustrated, Grateful, Awe.
 
 ### Senses Layer
 Senses Layer is handles the incoming data. This includes hearing (Speech to Text), temperature monitoring, seeing and other sensory related stuff.
