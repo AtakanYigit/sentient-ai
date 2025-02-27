@@ -16,17 +16,22 @@ lms server start
   
 3)- Adjust create your .env file according to .env.Example provided.  
   
-4)- Start the Sentient AI:
+4)- Install dependencies:
+```bash
+npm i
+```
+
+5)- Start the Sentient AI:
 ```bash
 npm run sentient
 ```
 
-5)- For vision open 'http://localhost:5173/' in your browser and select the right camera source.
+6)- For vision, open 'http://localhost:5173/' in your browser and select the right camera source.
 Chrome might not allow camera input for non secure (http) URLs. If you give camera permission and still don't see the camera feed, type:
 ```bash
 chrome://flags/#unsafely-treat-insecure-origin-as-secure
 ```
-in your browser, enable it and set it to 'http://localhost:5173' (without quotes).
+and enable 'unsafely-treat-insecure-origin-as-secure'. Set its value to 'http://localhost:5173' (without quotes).
 
 ## Layers Explained
 
