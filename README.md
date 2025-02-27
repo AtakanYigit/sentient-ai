@@ -7,21 +7,26 @@ This project explores the possibility of achieving consciousness through a funda
 - [LM Studio](https://lmstudio.ai/ "LM Studio") with an AI model. I suggest DeepSeek R1.
 
 ## How to Install?
-Start your LLM model:
+1)- Start your LLM model:
 ```bash
 lms server start
 ```
 
-Load your model in LM Studio.
+2)- Load your model in LM Studio.
   
-Start the Sentient AI:
+3)- Adjust create your .env file according to .env.Example provided.  
+  
+4)- Start the Sentient AI:
 ```bash
 npm run sentient
 ```
 
-Adjust create your .env file according to .env.Example provided.
-
-For vision open 'http://localhost:5173/' in your browser and select the right camera source.
+5)- For vision open 'http://localhost:5173/' in your browser and select the right camera source.
+Chrome might not allow camera input for non secure (http) URLs. If you give camera permission and still don't see the camera feed, type:
+```bash
+chrome://flags/#unsafely-treat-insecure-origin-as-secure
+```
+in your browser, enable it and set it to 'http://localhost:5173' (without quotes).
 
 ## Layers Explained
 
