@@ -80,6 +80,7 @@ const App = () => {
 
         const captureAndSend = async () => {
             try {
+                if(error) return;
                 console.log("captureAndSend");
                 // Create canvas if it doesn't exist
                 if (!canvasRef.current) {

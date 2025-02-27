@@ -228,6 +228,7 @@ export const ThoughtService = {
                 Context: ${latestContext[0]?.context}.
                 Short term memory: ${latestShortTermMemory[0]?.action}.
                 Past vision: ${latestPastVision[0]?.vision}.
+                Latest sentences you've heard: ${latestHearings.map((hearing: any) => hearing.hearing).join(" ")}.
                 Extra Command: ${recievedPrompt}
             `;
 

@@ -7,8 +7,12 @@ require("dotenv").config({ path: '../.env' });
 // const speechRepository = DB.getRepository(Speech);
 
 export const SpeechService = {
-    speak: async (text: string, emotion: string = "natural") => {
+    speak: async (text: string, tone: string = "natural") => {
         try {
+            if(!text || text === "" || text === "..." || text === "." || text === "empty") {
+                return {success: true};
+            }
+
             const elevenlabs = new ElevenLabsClient({
                 apiKey: process.env.ELEVENLABS_API_KEY,
             });
@@ -19,12 +23,10 @@ export const SpeechService = {
             const whisperVoice = "Alice - ASMR British Whisper";
             const naturalVoice = "Lily";
 
-            console.log(emotion);
-
             let voice: string;
-            if (emotion === "fierce") {
+            if (tone === "fierce") {
                 voice = fierceVoice;
-            } else if (emotion === "whisper") {
+            } else if (tone === "whisper") {
                 voice = whisperVoice;
             } else {
                 voice = naturalVoice;

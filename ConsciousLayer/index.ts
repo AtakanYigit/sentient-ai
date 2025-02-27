@@ -23,22 +23,10 @@ const openai = new OpenAI({
 
 const actionSchema = 
     z.object({
-        action: z.enum(["say", "do nothing"]),
-        value: z.string().optional()
-    }).refine(data => {
-        // if (["say", "move"].includes(data.action) && !data.value) {
-        if (["say"].includes(data.action) && !data.value) {
-            return false;
-        }
-        // Ensure value is empty when action is "do nothing"
-        if (data.action === "do nothing" && data.value) {
-            return false;
-        }
-        return true;
-    }, {
-        // message: "Value must be provided for 'say' and 'move' actions, and must be empty for 'do nothing' action"
-        message: "Value must be provided for 'say' action"
-    });
+        action: z.enum(["say", "move", "do nothing"]),
+        value: z.string(),
+        tone: z.enum(["natural", "fierce", "whisper"])
+    })
 
 const processDataAndTakeAction = async (channel: string) => {
     const lastAction = await ShortTermMemoriesRepository.findOne({
@@ -56,15 +44,52 @@ const processDataAndTakeAction = async (channel: string) => {
     }
 
     try {        
-        const res = await axios.post(`http://localhost:${process.env.THOUGHT_LAYER_PORT}/api/think/possible-actions-and-outcomes`, {
-            prompt: "What should I do?"
-        });
+        // const res = await axios.post(`http://localhost:${process.env.THOUGHT_LAYER_PORT}/api/think/possible-actions-and-outcomes`, {
+        //     prompt: "What should I do?"
+        // });
+        const res = await axios.post(`http://localhost:${process.env.THOUGHT_LAYER_PORT}/api/think/possible-actions-and-outcomes`);
 
         const actions = res.data;
 
         const prompt = `
             You are the conscious layer of the brain.
             You are given a list of possible actions and outcomes. You need to choose the best action to take. You are allowed to choose "do nothing" if you think it's not necessary. ${timeSinceLastAction ? `It has been ${timeSinceLastAction}ms since the last action you've taken.` : ""}
+            If you choose to say something, you need to provide the text you want to say and the tone you want to express. You can choose one of the following tones:
+            - natural
+            - fierce
+            - whisper
+            
+            If you choose to say something, you need to return "say" as the action and the text you want to say as the value. Use punctuation to express your emotion.
+            If you choose to do nothing, you need to return "do nothing" as the action and "do nothing" string as the value.
+
+            Example Output 1:
+            {
+                "action": "say",
+                "value": "Hello, nice to meet you!",
+                "tone": "natural"
+            }
+
+            Example Output 2:
+            {
+                "action": "say",
+                "value": "I hate you!!",
+                "tone": "fierce"
+            }
+
+            Example Output 3:
+            {
+                "action": "say",
+                "value": "We better be quiet, I love you!!",
+                "tone": "whisper"
+            }
+
+            Example Output 4:
+            {
+                "action": "do nothing",
+                "value": "do nothing",
+                "tone": "natural"
+            }
+            
             Here are the possible actions:
             ${actions}
         `;
@@ -81,6 +106,13 @@ const processDataAndTakeAction = async (channel: string) => {
         });
 
         console.log(actionTaken.choices[0].message.content);
+        const { action, value, tone } = JSON.parse(actionTaken.choices[0].message.content);
+
+        if (action === "say") {
+            axios.post(`http://localhost:${process.env.MOTOR_FUNCTIONS_LAYER_PORT}/api/speech`, {text: value, tone: tone.toLowerCase()});
+        }else if (action === "do nothing") {
+            console.log("No action taken");
+        }
 
     } catch (error) {
         console.error("Error in ConsciousLayer/index.ts:");

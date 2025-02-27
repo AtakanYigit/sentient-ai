@@ -48,5 +48,5 @@ app.listen({ port: process.env.SENSES_LAYER_PORT }, () => {
     console.info(`Senses Layer Started. Running on port ${process.env.SENSES_LAYER_PORT}`);
 
     // Continuous Listening
-    // hearAndProcess();
+    hearAndProcess();
 });

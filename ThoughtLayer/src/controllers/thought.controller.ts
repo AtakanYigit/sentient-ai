@@ -16,7 +16,6 @@ export const ThoughtController = {
     possibleActionsAndOutcomes: async (req: Request, res: Response) => {
         try {
             const recievedPrompt = req?.body?.prompt;
-            console.log(recievedPrompt);
             const result = await ThoughtService.possibleActionsAndOutcomes({recievedPrompt});
             res.status(200).json(result);
         } catch (error) {

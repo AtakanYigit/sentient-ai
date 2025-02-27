@@ -46,7 +46,9 @@ export const MemoriesService = {
                 - A context(optional)
                 - You might receive other information depending on your body. Such as emotions, vitals, visual, auditory, recent reflexes, recent actions and interactions, etc.
                 You need to decide whether the latest action is important enough to be remembered in the long term memory or only short term memory.
-                Don't forget, long term memory is expensive to maintain, so it should only be used for important actions that need to be remembered for a long time. Every action you store in long term memory will also be stored in the short term memory. 
+                Don't forget, long term memory is expensive to maintain, so it should only be used for important actions that need to be remembered for a long time. Every action you store in long term memory will also be stored in the short term memory. Do not add simple questions or basic interactions in the long term memory.
+                Do not store actions that are not really vital in the long term in the long-term memory.
+
                 You also need to decide the level of importance of the action. (1-3).
                 - Level 1: Important enough to be remembered for a long time. Things that got you excited, things that you regret not doing, things that you regret doing, etc.
                 - Level 2: Important to be remembered for a medium time. Important conversations, important decisions, important actions, etc.
@@ -88,10 +90,31 @@ export const MemoriesService = {
                     }
                 }
 
+                Example 6:
+                Action: "I am feeling hungry"
+                Return: { saveInLongTermMemory: false, memory: "" }
+
+                Example 7:
+                You are feeling: Bored: 6/10, Sad: 4/10, Lonely: 3/10
+                Action: "I see a bird on the deck. It is lightly coloured. It is a sparrow eating a worm."
+                Return: { saveInLongTermMemory: false, memory: "" }
+
+                Example 8:
+                Action: "What is the capital of France?"
+                Return: { saveInLongTermMemory: false, memory: "" }
+
+                Example 9:
+                Action: "Hello, how are you?"
+                Return: { saveInLongTermMemory: false, memory: "" }
+
+                Example 10:
+                Action: "What is your name?"
+                Return: { saveInLongTermMemory: false, memory: "" }
+
                 Here is the current situation:
                 Your vital values: ${vitals.map((vital: any) => `${vital.name}: ${vital.value}/100,`).join(" and ")}.
-                You are feeling ${emotions.map((emotion: any) => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10,`).join(" and ")}
-                Context: ${context?.context}.
+                You are feeling ${emotions.map((emotion: any) => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10,`).join(", ")}.
+                Context: ${context?.context}
                 Latest Action: ${action}
             `;
             

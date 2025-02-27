@@ -30,7 +30,6 @@ export const SensesService = {
                 where: { createdAt: new Date(Date.now() - 60000), type: "vision" },
                 order: { createdAt: "DESC" },
             });
-    
 
             const prompt = `
                 You are the visual understanding layer of the brain and your job is to understand the image you are getting from your eyes.
@@ -41,7 +40,8 @@ export const SensesService = {
                 - You must describe the image in detail.
                 - Image comes from your eyes, so you must describe it in the way a human would see it.
                 - You are not allowed to mention stuff like, "I see camera buttons", "this might be a camera", "this might be a phone", etc.
-                - You are given the last vision you had, this is given to you as a reference. Do not mention it in your response. Do not compare it with the new image. It is only for you to have a context of what you saw before. It is not part of the new image.
+                - You are given the last vision you had, this is given to you as a reference. Do not mention it in your response. Do not compare it with the new image. It is only for you to have a context of what you saw before. It is not part of the new image. If the new image is similar to the last vision,you may repeat what you said before, do not ignore the old stuff.
+                - Do not mention anything you don't see in the image, even if the context or the last vision mentions it. You must strictly tell what you see in the image.
 
                 Last vision text: 
                 ${pastVision?.action}.
@@ -87,7 +87,13 @@ export const SensesService = {
                 vision = result.response.text();
             }
 
-            sendActionToMemoryLayer(`I see: ${vision}`, "visual");
+            if(vision) {
+                vision = vision.replace("Here's a description of the image:", "");
+                vision = vision.replace("Here is a description of the image:", "");
+                vision = vision.replace("Here is the description of the image:", "");
+                
+                sendActionToMemoryLayer(`I see: ${vision}`, "visual");
+            }
 
             return { success: true };
         } catch (error) {
