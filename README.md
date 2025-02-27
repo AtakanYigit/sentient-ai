@@ -32,7 +32,7 @@ Thought Layer is the API that allows other layers to generate thoughts. Thought 
 
 ### Memories Layer
 Memories Layer is where all the memories are handled. It consists of two parts. Long-term memory and short-term memory. When an event happens in other layers (eg. someone says something and system hears this, a conversation happens, system takes action, system says something etc.) this layer is informed. Then LLM runs with the action, current emotions and vital values. LLM determines if this action is worth for the long-term memory or not.
-
+  
 - Short-term memory is cheap, and lasts for a minute (a little longer than a human's, as the system is not as fast as a human). Entries older than a minute is removed from the memory.
 - Long-term memory is expensive. Memories in this layer has 3 levels of importance (1: not very important - 3: very important). If a memory is not accessed frequently it loses importance level and if level reaches 0 it is removed from long-term memory.
 
@@ -49,6 +49,7 @@ Senses Layer is handles the incoming data. This includes hearing (Speech to Text
 
 ### Motor FunctionsLayer
 Motor Functions Layer is responsible for physical actions of the model. This includes speaking (Text to Speech), moving, turning and more.
+**Note:** If your local LLM modal doesn't support image input you need to provide you must provide a Google AI Studio [API key](https://aistudio.google.com/apikey).
 
 ### Conscious Layer (Decision Making Layer)
 Conscious Layer is the main decision making layer. It can ask other layers for information but that is this layer's job to decide on the action. It doesn't think on its own, it only uses other layers.
