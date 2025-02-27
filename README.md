@@ -7,13 +7,14 @@ This project explores the possibility of achieving consciousness through a funda
 - [LM Studio](https://lmstudio.ai/ "LM Studio") with an AI model. I suggest DeepSeek R1.
 
 ## How to Install?
-run:
+Start your LLM model:
 ```bash
 lms server start
 ```
 
 Load your model in LM Studio
-
+  
+Start the Sentient AI:
 ```bash
 npm run sentient
 ```
