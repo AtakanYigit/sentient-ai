@@ -29,11 +29,16 @@ const hearAndProcess = () => {
     // Create a recognize stream
     const recognizeStream = client
         .streamingRecognize(request as any)
-        .on("error", (error) => {console.error("Error in recognition stream:", error);})
+        .on("error", (error) => {
+            console.error("Error in hearing in SensesLayer/src/utils/hearAndProcess.ts:");
+            if(process.env.DEBUG === "ON") {
+                console.error(error);
+            }
+        })
         .on("data", (data: any) => {
             if (data.results[0] && data.results[0].alternatives[0]) {
                 const transcription = data.results[0].alternatives[0].transcript;
-                sendActionToMemoryLayer(`I heard: ${transcription}`);
+                sendActionToMemoryLayer(`I heard: ${transcription}`, "audio");
             }
         });
 
@@ -52,18 +57,29 @@ const hearAndProcess = () => {
             .record(recordingOptions)
             .stream()
             .on("error", (error) => {
-                console.error("Error in recording stream:", error);
+                console.error("Error in recording stream in SensesLayer/src/utils/hearAndProcess.ts:");
+                if(process.env.DEBUG === "ON") {
+                    console.error(error);
+                }
                 // Try alternative recording program if first one fails
                 recordingOptions.recordProgram = "sox";
                 recorder
                     .record(recordingOptions)
                     .stream()
-                    .on("error", (error) => {console.error("Error with alternative recording program:", error);})
+                    .on("error", (error) => {
+                        console.error("Error with alternative recording program in SensesLayer/src/utils/hearAndProcess.ts:");
+                        if(process.env.DEBUG === "ON") {
+                            console.error(error);
+                        }
+                    })
                     .pipe(recognizeStream);
             })
             .pipe(recognizeStream);
     } catch (error) {
-        console.error("Failed to start hearing:", error);
+        console.error("Failed to start hearing in SensesLayer/src/utils/hearAndProcess.ts:");
+        if(process.env.DEBUG === "ON") {
+            console.error(error);
+        }
     }
 };
 

@@ -5,13 +5,13 @@ import {z}                      from "zod";
 import {zodResponseFormat}      from "openai/helpers/zod";
 import {DB}                     from "../config/database";
 import sendActionToMemoryLayer  from "../utils/sendActionTomemoryLayer";
-import {PastVisions}            from "../entities/PastVisions";
+import {ShortTermMemories}      from "../entities/ShortTermMemories";
 // import {Context}               from "../entities/Context";
 
 require("dotenv").config({ path: '../.env' });
 
 // const contextRepository = DB.getRepository(Context);
-const pastVisionsRepository = DB.getRepository(PastVisions);
+const shortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 
 const openai = new OpenAI({
     baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
@@ -24,10 +24,10 @@ const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
 export const SensesService = {
     seeAndProcess: async (file: Express.Multer.File) => {
         try {
-            const base64Image = file.buffer.toString("base64");
+            const base64Image = file?.buffer?.toString("base64");
             
-            const pastVision = await pastVisionsRepository.findOne({
-                where: { createdAt: new Date(Date.now() - 60000) },
+            const pastVision = await shortTermMemoriesRepository.findOne({
+                where: { createdAt: new Date(Date.now() - 60000), type: "vision" },
                 order: { createdAt: "DESC" },
             });
     
@@ -44,7 +44,7 @@ export const SensesService = {
                 - You are given the last vision you had, this is given to you as a reference. Do not mention it in your response. Do not compare it with the new image. It is only for you to have a context of what you saw before. It is not part of the new image.
 
                 Last vision text: 
-                ${pastVision?.vision}.
+                ${pastVision?.action}.
 
 
                 Here is the image, describe what you see in detail.
@@ -87,15 +87,14 @@ export const SensesService = {
                 vision = result.response.text();
             }
 
-            sendActionToMemoryLayer(`I saw: ${vision}`);
-
-            const newVision = new PastVisions();
-            newVision.vision = vision;
-            await pastVisionsRepository.save(newVision);
+            sendActionToMemoryLayer(`I see: ${vision}`, "visual");
 
             return { success: true };
         } catch (error) {
-            console.log(error);
+            console.log("Error in SensesLayer/src/services/senses.service.ts:");
+            if(process.env.DEBUG === "ON") {
+                console.error(error);
+            }
             return { success: false };
         }
     },

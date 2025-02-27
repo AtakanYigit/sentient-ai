@@ -47,6 +47,9 @@ export const checkLongTermMemory = async () => {
 
         console.log(`Checked ${memoriesToCheck.length} long-term memories`);
     } catch (error) {
-        console.error("Error checking long-term memories:", error);
+        console.error("Error checking long-term memories in MemoriesLayer/src/utils/checkLongTermMemory.ts:");
+        if(process.env.DEBUG === "ON") {
+            console.error(error);
+        }
     }
 };

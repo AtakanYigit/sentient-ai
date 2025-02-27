@@ -1,5 +1,6 @@
 import {DataSource} from "typeorm";
 import path         from "path";
+import createSubscriber from "pg-listen";
 
 require("dotenv").config({ path: '../.env' });
 
@@ -36,4 +37,9 @@ export const DB = new DataSource({
     migrations:     [path.join(__dirname, "../migrations/*.{ts,js}")],
     subscribers:    [],
     entities:       [path.join(__dirname, "../src/entities/*.{ts,js}")],
+});
+
+export const pgListener = createSubscriber({
+    connectionString: `postgres://${dbConfig.user}:${dbConfig.password}@${dbConfig.host}:${dbConfig.port}/${dbConfig.database}`,
+    retryInterval: 1000,
 });

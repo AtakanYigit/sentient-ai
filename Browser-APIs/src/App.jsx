@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "./App.css";
 
-require("dotenv").config({ path: '../.env' });
+const SENSES_LAYER_PORT = 8087;
 
 const App = () => {
     console.log("Browser-APIs Started");
@@ -55,7 +55,8 @@ const App = () => {
                     videoRef.current.srcObject = stream;
                 }
             } catch (err) {
-                console.error("Camera error details:", err);
+                console.error("Camera error in Browser-APIs/src/App.jsx:");
+
                 setError(`Camera access failed: ${err.message}. Please ensure:
                     1. Your browser has camera permissions
                     2. No other app is using the camera
@@ -104,17 +105,17 @@ const App = () => {
                 formData.append("image", blob);
                 
                 // Send to server
-                await axios.post(`http://localhost:${process.env.SENSES_LAYER_PORT}/api/senses`, formData, {
+                await axios.post(`http://localhost:${SENSES_LAYER_PORT}/api/senses`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 }).then(response => {
                     console.log(response.data);
-                }).catch(error => {
-                    console.error("Screenshot error:", error);
+                }).catch(err => {
+                    console.error("Screenshot error in Browser-APIs/src/App.jsx:");
                 });
             } catch (err) {
-                console.error("Screenshot error:", err);
+                console.error("Screenshot error in Browser-APIs/src/App.jsx:");
             }
         };
 

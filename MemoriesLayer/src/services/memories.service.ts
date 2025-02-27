@@ -21,7 +21,7 @@ const openai = new OpenAI({
 });
 
 export const MemoriesService = {
-    processAction: async (action: string) => {
+    processAction: async (action: string, type: string) => {
         try {
             const longTermMemorySchema = z.object({
                 saveInLongTermMemory: z.boolean(),
@@ -121,6 +121,7 @@ export const MemoriesService = {
 
             const shortTermMemory = shortTermMemoriesRepository.save({
                 action: action,
+                type: type,
                 createdAt: new Date(),
             });
 

@@ -13,11 +13,11 @@ export const ThoughtController = {
             res.status(500).json({message: "Error fetching thought"});
         }
     },
-    possibleOutcomes: async (req: Request, res: Response) => {
+    possibleActionsAndOutcomes: async (req: Request, res: Response) => {
         try {
-            const recievedPrompt = req.body.prompt;
-            const context        = req.body.context;
-            const result = await ThoughtService.possibleOutcomes({recievedPrompt, context});
+            const recievedPrompt = req?.body?.prompt;
+            console.log(recievedPrompt);
+            const result = await ThoughtService.possibleActionsAndOutcomes({recievedPrompt});
             res.status(200).json(result);
         } catch (error) {
             res.status(500).json({message: "Error fetching possible outcomes"});

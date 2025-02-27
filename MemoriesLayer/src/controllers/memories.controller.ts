@@ -5,7 +5,8 @@ export const MemoriesController = {
     processAction: async (req: Request, res: Response) => {
         try {
             const action = req.body.action;
-            const result = await MemoriesService.processAction(action);
+            const type = req.body.type;
+            const result = await MemoriesService.processAction(action, type);
             res.status(200).json(result);
         } catch (error) {
             res.status(500).json({message: "Error fetching thought"});

@@ -2,12 +2,12 @@ import {OpenAI}            from "openai";
 import {DB}                from "./config/database";
 import {Context}           from "./src/entities/Context";
 import {Vitals}            from "./src/entities/Vitals";
-import {PastVisions}       from "./src/entities/PastVisions";
+import {ShortTermMemories} from "./src/entities/ShortTermMemories";
 import axios               from "axios";
 
 const vitalsRepository = DB.getRepository(Vitals);
 const contextRepository = DB.getRepository(Context);
-const pastVisionsRepository = DB.getRepository(PastVisions);
+const shortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 
 require("dotenv").config({ path: '../.env' });
 
@@ -31,9 +31,9 @@ const fetchAndProcessContext = async () => {
                 where: { createdAt: new Date(Date.now() - 60000) },
                 order: { createdAt: "DESC" },
             }),
-            
-            pastVisionsRepository.findOne({
-                where: { createdAt: new Date(Date.now() - 60000) },
+
+            shortTermMemoriesRepository.findOne({
+                where: { createdAt: new Date(Date.now() - 60000), type: "vision" },
                 order: { createdAt: "DESC" },
             }),
             
@@ -42,8 +42,10 @@ const fetchAndProcessContext = async () => {
             axios.get<Array<{ name: string; distance: number }>>(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`)
         ]);
 
+        console.log(emotionsResponse.data);
+
         // Process emotions data
-        const emotions = emotionsResponse?.data?.sort((a, b) => a.distance - b.distance).slice(0, 3);
+        const emotions = emotionsResponse?.data?.sort((a, b) => a.distance - b.distance)?.slice(0, 3);
 
         if (!emotions) {
             throw new Error("Failed to fetch emotions data");
@@ -90,7 +92,7 @@ const fetchAndProcessContext = async () => {
             Your vital values: ${vitals.map(vital => `${vital.name}: ${vital.level}/100`).join(", ")}.
             You are feeling ${emotions.map(emotion => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10`).join(", ")}.
             Previous context: ${prevContext?.context ?? "No previous context available"}
-            ${lastVision ? `Last vision: ${lastVision.vision}` : ""}
+            ${lastVision ? `Last vision: ${lastVision.action}` : ""}
         `;
 
         const response = await openai.chat.completions.create({
@@ -105,10 +107,16 @@ const fetchAndProcessContext = async () => {
 
             console.log("API Response:", response.choices[0].message.content);
         } else {
-            console.error("No response from OpenAI");
+            console.error("No response from OpenAI in DeepThinkingLayer/index.ts:");
+            if(process.env.DEBUG === "ON") {
+                console.error(response);
+            }
         }
     } catch (error) {
-        console.error("Error in context processing:", error instanceof Error ? error.message : "Unknown error");
+        console.error("Error in context processing in DeepThinkingLayer/index.ts:");
+        if(process.env.DEBUG === "ON") {
+            console.error(error);
+        }
         throw error; // Re-throw to handle it in the caller if needed
     }
 };

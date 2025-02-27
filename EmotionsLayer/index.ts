@@ -14,7 +14,10 @@ const connectDB = async () => {
     try {
         await DB.initialize();
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
+        console.error("Unable to connect to the database in EmotionsLayer/index.ts:");
+        if(process.env.DEBUG === "ON") {
+            console.error(error);
+        }
         process.exit(1);
     }
 };

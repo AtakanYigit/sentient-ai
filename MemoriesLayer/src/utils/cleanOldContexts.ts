@@ -14,6 +14,9 @@ export const cleanOldContexts = async () => {
         
         console.log("Cleaned contexts older than 5 minutes");
     } catch (error) {
-        console.error("Error cleaning old contexts:", error);
+        console.error("Error cleaning old contexts in MemoriesLayer/src/utils/cleanOldContexts.ts:");
+        if(process.env.DEBUG === "ON") {
+            console.error(error);
+        }
     }
 };

@@ -5,7 +5,6 @@ export const SensesController = {
     seeAndProcess: async (req: Request, res: Response) => {
         try {
             const file = req.file as Express.Multer.File;
-            console.log(file);
             const result = await SensesService.seeAndProcess(file);
             res.status(200).json(result);
         } catch (error) {

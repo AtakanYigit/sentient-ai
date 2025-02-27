@@ -25,6 +25,9 @@ export class ShortTermMemories {
   })
   lastAccessed: Date;
 
-  @Column("integer", { name: "totall_accesses", default: () => "0" })
-  totallAccesses: number;
+  @Column("integer", { name: "total_accesses", default: () => "0" })
+  totalAccesses: number;
+
+  @Column("character varying", { name: "type" })
+  type: string;
 }

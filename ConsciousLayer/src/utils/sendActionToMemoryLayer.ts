@@ -1,12 +1,10 @@
 import axios from "axios";
-require("dotenv").config({ path: '../.env' });
 
 const sendActionToMemoryLayer = async (action: string, type: string) => {
     try {
-        console.log(action, type);
         const response = await axios.post(`http://localhost:${process.env.MEMORIES_LAYER_PORT}/api/memories`, {action: action, type: type});
     } catch (error) {
-        console.log("Error sending action to memory layer in SensesLayer/src/utils/sendActionTomemoryLayer.ts:");
+        console.error("Error sending action to memory layer in ConsciousLayer/src/utils/sendActionToMemoryLayer.ts:");
         if(process.env.DEBUG === "ON") {
             console.error(error);
         }

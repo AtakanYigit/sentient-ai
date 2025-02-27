@@ -1,7 +1,15 @@
-import OpenAI from "openai";
-import axios from "axios";
-import { z } from "zod";
-import { zodResponseFormat } from "openai/helpers/zod";
+import OpenAI              from "openai";
+import axios               from "axios";
+import {DB}                from "../../src/config/database";
+import {z}                 from "zod";
+import {zodResponseFormat} from "openai/helpers/zod";
+import {Context}           from "../entities/Context";
+import {Vitals}            from "../entities/Vitals";
+import {ShortTermMemories} from "../entities/ShortTermMemories";
+ 
+const ContextRepository           = DB.getRepository(Context);
+const VitalsRepository            = DB.getRepository(Vitals);
+const ShortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 
 export const ThoughtService = {
     think: async ({recievedPrompt, answerLength = "Short", context = "No context provided"}: {recievedPrompt: string, answerLength: string, context: string}) => {
@@ -74,16 +82,61 @@ export const ThoughtService = {
             return { success: false };
         }
     },
-    possibleOutcomes: async ({recievedPrompt, context = "No context provided"}: {recievedPrompt: string, context: string}) => {
+    possibleActionsAndOutcomes: async ({recievedPrompt = "No extra command provided."}: {recievedPrompt: string}) => {
         try {
             const openai = new OpenAI({
                 baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
                 apiKey: "not-needed"
             });
 
-            let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
-            let emotions = emotionsResponse.data.sort((a: any, b: any) => a.distance - b.distance);
-                emotions = emotions.slice(0, 3);
+            // Fetch all data in parallel with error handling for each promise
+            const fetchWithFallback = async (promise: Promise<any>, defaultValue: any) => {
+                try {
+                    return await promise;
+                } catch (error) {
+                    console.log("Error fetching data in possibleActionsAndOutcomes / think.service.ts:");
+                    if(process.env.DEBUG === "ON") {
+                        console.error(error);
+                    }
+                    return defaultValue;
+                }
+            };
+
+            const [
+                latestContext,
+                latestVitals,
+                latestShortTermMemory,
+                latestPastVision,
+                latestHearings,
+                emotionsResponse
+            ] = await Promise.all([
+                fetchWithFallback(ContextRepository.find({
+                    order: { createdAt: "DESC" },
+                    take: 1
+                }), []),
+                fetchWithFallback(VitalsRepository.find({
+                    order: { id: "DESC" },
+                    take: 1
+                }), []),
+                fetchWithFallback(ShortTermMemoriesRepository.find({
+                    where: { type: "action" },
+                    order: { createdAt: "DESC" },
+                    take: 1
+                }), []),
+                fetchWithFallback(ShortTermMemoriesRepository.find({
+                    where: { type: "audio" },
+                    order: { createdAt: "DESC" },
+                    take: 10
+                }), []),
+                fetchWithFallback(ShortTermMemoriesRepository.find({
+                    where: { type: "vision" },
+                    order: { createdAt: "DESC" },
+                    take: 1
+                }), []),
+                fetchWithFallback(axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`), { data: [] })
+            ]);
+    
+            let emotions = emotionsResponse?.data?.sort((a: any, b: any) => a.distance - b.distance).slice(0, 3);
 
             const schema = z.object({
                 options: z.array(z.object({
@@ -172,8 +225,10 @@ export const ThoughtService = {
 
                 Here is the current situation:
                 You are feeling ${emotions.map((emotion: any) => `${emotion.name}: ${Math.round(10 - emotion.distance)}/10,`).join(" and ")}
-                Context: ${context}.
-                Prompt you need to answer: ${recievedPrompt}
+                Context: ${latestContext[0]?.context}.
+                Short term memory: ${latestShortTermMemory[0]?.action}.
+                Past vision: ${latestPastVision[0]?.vision}.
+                Extra Command: ${recievedPrompt}
             `;
 
             const response = await openai.chat.completions.create({
@@ -194,5 +249,5 @@ export const ThoughtService = {
             console.log(error);
             return { success: false };
         }
-    }
+    },
 }
