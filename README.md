@@ -12,7 +12,7 @@ Start your LLM model:
 lms server start
 ```
 
-Load your model in LM Studio
+Load your model in LM Studio.
   
 Start the Sentient AI:
 ```bash
