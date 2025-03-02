@@ -29,6 +29,9 @@ const actionSchema =
     })
 
 const processDataAndTakeAction = async (channel: string) => {
+    console.log("------------------PROCESSING DATA AND TAKING ACTION------------------");
+    console.log(channel);
+
     const lastAction = await ShortTermMemoriesRepository.findOne({
         where: {
             type: "action"
@@ -48,7 +51,7 @@ const processDataAndTakeAction = async (channel: string) => {
         //     prompt: "What should I do?"
         // });
         const res = await axios.post(`http://localhost:${process.env.THOUGHT_LAYER_PORT}/api/think/possible-actions-and-outcomes`);
-
+        console.log(res.data);
         const actions = res.data;
 
         const prompt = `
@@ -105,6 +108,7 @@ const processDataAndTakeAction = async (channel: string) => {
             response_format: zodResponseFormat(actionSchema, "json_schema")
         });
 
+        console.log("------------------ACTION TAKEN------------------");
         console.log(actionTaken.choices[0].message.content);
         const { action, value, tone } = JSON.parse(actionTaken.choices[0].message.content);
 

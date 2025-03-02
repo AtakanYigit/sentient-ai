@@ -3,6 +3,7 @@ import axios from "axios";
 import "./App.css";
 
 const SENSES_LAYER_PORT = 8087;
+const PHOTO_CAPTURE_INTERVAL = 30000; // 30 seconds
 
 const App = () => {
     console.log("Browser-APIs Started");
@@ -128,7 +129,7 @@ const App = () => {
         videoRef.current.addEventListener("playing", handleVideoPlay);
         
         // Set up interval for captures
-        const photoCaptureInterval = setInterval(captureAndSend, 30000); // 30 seconds
+        const photoCaptureInterval = setInterval(captureAndSend, PHOTO_CAPTURE_INTERVAL); // 30 seconds
         captureAndSend();
 
         return () => {

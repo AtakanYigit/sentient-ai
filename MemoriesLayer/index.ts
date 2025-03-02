@@ -33,7 +33,7 @@ app.listen({ port: process.env.MEMORIES_LAYER_PORT }, () => {
     connectDB();
     console.info(`Memories Layer Started. Running on port ${process.env.MEMORIES_LAYER_PORT}`);
 
-    setInterval(checkLongTermMemory, 3600000); // Hourly
-    setInterval(cleanShortTermMemory, 30000); // Every 30 seconds
-    setInterval(cleanOldContexts, 120000); // Every 2 Minutes
+    setInterval(checkLongTermMemory, parseInt(process.env.CHECK_LONG_TERM_MEMORY_INTERVAL));
+    setInterval(cleanShortTermMemory, parseInt(process.env.CLEAN_SHORT_TERM_MEMORY_INTERVAL));
+    setInterval(cleanOldContexts, parseInt(process.env.CLEAN_OLD_CONTEXTS_INTERVAL));
 });

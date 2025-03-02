@@ -116,7 +116,7 @@ const fetchAndProcessContext = async () => {
             ${lastVision ? `Last vision: ${lastVision.action}` : ""}
         `;
 
-        console.log(prompt);
+        // console.log(prompt);
 
         const response = await openai.chat.completions.create({
             model: "local-model",
@@ -147,7 +147,7 @@ const fetchAndProcessContext = async () => {
 const init = () => {
     fetchAndProcessContext();
 
-    setInterval(fetchAndProcessContext, 30000);
+    setInterval(fetchAndProcessContext, parseInt(process.env.DEEP_THINKING_LAYER_INTERVAL));
 };
 
 init();
