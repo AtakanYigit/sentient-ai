@@ -14,8 +14,8 @@ require("dotenv").config({ path: '../.env' });
 const shortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 
 const openai = new OpenAI({
-    baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
-    apiKey: "not-needed"
+    baseURL: process.env.LLM_BASE_URL,
+    apiKey: process.env.OPENAI_API_KEY || "not-needed"
 });
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY);
@@ -54,7 +54,7 @@ export const SensesService = {
             let vision;
             try {
                 const result = await openai.chat.completions.create({
-                    model: "local-model",
+                    model: process.env.OPENAI_MODEL,
                     messages: [{ 
                         role: "user", 
                         content: [

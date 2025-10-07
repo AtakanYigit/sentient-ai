@@ -15,8 +15,8 @@ export const ThoughtService = {
     think: async ({recievedPrompt, answerLength = "Short", context = "No context provided"}: {recievedPrompt: string, answerLength: string, context: string}) => {
         try {
             const openai = new OpenAI({
-                baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
-                apiKey: "not-needed"
+                baseURL: process.env.LLM_BASE_URL,
+                apiKey: process.env.OPENAI_API_KEY || "not-needed"
             });
 
             let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
@@ -61,7 +61,7 @@ export const ThoughtService = {
             `;
 
             const response = await openai.chat.completions.create({
-                model: "local-model",
+                model: process.env.OPENAI_MODEL,
                 messages: [
                     { role: "user", content: prompt }
                 ]
@@ -85,8 +85,8 @@ export const ThoughtService = {
     possibleActionsAndOutcomes: async ({recievedPrompt = "No extra command provided."}: {recievedPrompt: string}) => {
         try {
             const openai = new OpenAI({
-                baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
-                apiKey: "not-needed"
+                baseURL: process.env.LLM_BASE_URL,
+                apiKey: process.env.OPENAI_API_KEY || "not-needed"
             });
 
             // Fetch all data in parallel with error handling for each promise
@@ -233,7 +233,7 @@ export const ThoughtService = {
             `;
 
             const response = await openai.chat.completions.create({
-                model: "local-model",
+                model: process.env.OPENAI_MODEL,
                 messages: [
                     { 
                         role: "user", 

@@ -3,8 +3,20 @@ This project explores the possibility of achieving consciousness through a funda
 
 ## Required: 
 - [Node.js](https://nodejs.org/en/download)
+- [LM Studio](https://lmstudio.ai/ "LM Studio") with an AI model. (Only for locally run projects)
 - [Sox](https://sourceforge.net/projects/sox/files/sox/14.4.1/) (14.4.1 suggested)
-- [LM Studio](https://lmstudio.ai/ "LM Studio") with an AI model. I suggest DeepSeek R1.
+
+For Mac OS
+```
+brew install sox
+```
+
+For most linux disto's
+```
+sudo apt-get install sox libsox-fmt-all
+```
+
+For Windows download the (binaries)[https://sourceforge.net/projects/sox/files/latest/download]
 
 ## How to Install?
 1)- Start your LLM model:

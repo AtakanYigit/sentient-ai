@@ -17,8 +17,8 @@ require("dotenv").config({ path: '../.env' });
 console.log("Conscious Layer Started");
 
 const openai = new OpenAI({
-    baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
-    apiKey: "not-needed"
+    baseURL: process.env.LLM_BASE_URL,
+    apiKey: process.env.OPENAI_API_KEY || "not-needed"
 });
 
 const actionSchema = 
@@ -98,7 +98,7 @@ const processDataAndTakeAction = async (channel: string) => {
         `;
 
         const actionTaken = await openai.chat.completions.create({
-            model: "local-model",
+            model: process.env.OPENAI_MODEL,
             messages: [
                 { 
                     role: "user", 

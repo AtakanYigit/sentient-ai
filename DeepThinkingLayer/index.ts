@@ -14,17 +14,12 @@ require("dotenv").config({ path: '../.env' });
 console.log("Deep Thinking Layer Started");
 
 const openai = new OpenAI({
-    baseURL: `http://localhost:${process.env.LM_SERVER_PORT}/v1`,
-    apiKey: "not-needed"
+    baseURL: process.env.LLM_BASE_URL,
+    apiKey: process.env.OPENAI_API_KEY || "not-needed"
 });
 
 const fetchAndProcessContext = async () => {
     try {
-        // Initialize DB only if needed
-        if (!DB.isInitialized) {
-            await DB.initialize();
-        }
-
         // Fetch all data in parallel
         const [prevContext, lastVision, vitals, emotionsResponse] = await Promise.all([
             contextRepository.findOne({
@@ -119,7 +114,7 @@ const fetchAndProcessContext = async () => {
         // console.log(prompt);
 
         const response = await openai.chat.completions.create({
-            model: "local-model",
+            model: process.env.OPENAI_MODEL,
             messages: [{ role: "user", content: prompt.trim() }],
         });
 
@@ -140,14 +135,44 @@ const fetchAndProcessContext = async () => {
         if(process.env.DEBUG === "ON") {
             console.error(error);
         }
-        throw error; // Re-throw to handle it in the caller if needed
+        // Don't re-throw - let the interval continue on next iteration
     }
 };
 
-const init = () => {
-    fetchAndProcessContext();
+const waitForEmotionsLayer = async (retries = 3, delay = 2000): Promise<boolean> => {
+    for (let i = 0; i < retries; i++) {
+        try {
+            await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
+            console.log("EmotionsLayer is ready");
+            return true;
+        } catch (error) {
+            console.log(`Waiting for EmotionsLayer to start... (attempt ${i + 1}/${retries})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+    }
+    return false;
+};
 
-    setInterval(fetchAndProcessContext, parseInt(process.env.DEEP_THINKING_LAYER_INTERVAL));
+const init = async () => {
+    try {
+        await DB.initialize();
+        console.log("Database initialized");
+        
+        // Wait for EmotionsLayer to be ready before starting
+        const isEmotionsLayerReady = await waitForEmotionsLayer();
+        
+        if (!isEmotionsLayerReady) {
+            console.warn("EmotionsLayer not available after retries. DeepThinkingLayer will continue but may encounter errors.");
+        }
+        
+        fetchAndProcessContext();
+        setInterval(fetchAndProcessContext, parseInt(process.env.DEEP_THINKING_LAYER_INTERVAL));
+    } catch (error) {
+        console.error("Error initializing database in DeepThinkingLayer/index.ts:");
+        if(process.env.DEBUG === "ON") {
+            console.error(error);
+        }
+    }
 };
 
 init();

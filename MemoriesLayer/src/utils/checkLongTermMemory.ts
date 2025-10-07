@@ -13,7 +13,7 @@ export const checkLongTermMemory = async () => {
         // Find memories that haven't been checked in the last 2 days
         const memoriesToCheck = await longTermMemoriesRepository.find({
             where: {
-                lastChecked: LessThan(twoDaysAgo.toISOString())
+                lastChecked: LessThan(twoDaysAgo)
             }
         });
 
@@ -38,7 +38,7 @@ export const checkLongTermMemory = async () => {
             }
 
             // Update last checked time and total accesses
-            memory.lastChecked = now.toISOString();
+            memory.lastChecked = now;
             memory.totalAccessesLast = memory.totalAccesses;
 
             // Save updated memory

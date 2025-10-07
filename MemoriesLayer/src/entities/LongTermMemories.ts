@@ -31,11 +31,11 @@ export class LongTermMemories {
   @Column("integer", { name: "levelOfImportance" })
   levelOfImportance: number;
 
-  @Column("time with time zone", {
+  @Column("timestamp with time zone", {
     name: "last_checked",
     default: () => "CURRENT_TIMESTAMP",
   })
-  lastChecked: string;
+  lastChecked: Date;
 
   @Column("integer", { name: "total_accesses_last", default: () => "0" })
   totalAccessesLast: number;
