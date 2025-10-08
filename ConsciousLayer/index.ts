@@ -1,12 +1,13 @@
-import {OpenAI}                from "openai";
+// import {OpenAI}                from "openai";
+import {GoogleGenerativeAI, SchemaType, Schema} from "@google/generative-ai";
 import {DB, pgListener}        from "./config/database";
 import {Context}               from "./src/entities/Context";
 import {Vitals}                from "./src/entities/Vitals";
 import {ShortTermMemories}     from "./src/entities/ShortTermMemories";
 import sendActionToMemoryLayer from "./src/utils/sendActionToMemoryLayer";
 import axios                   from "axios";
-import {zodResponseFormat}     from "openai/helpers/zod";
-import {z}                     from "zod";
+// import {zodResponseFormat}     from "openai/helpers/zod";
+// import {z}                     from "zod";
 
 const ContextRepository           = DB.getRepository(Context);
 const VitalsRepository            = DB.getRepository(Vitals);
@@ -16,21 +17,34 @@ require("dotenv").config({ path: '../.env' });
 
 console.log("Conscious Layer Started");
 
-const openai = new OpenAI({
-    baseURL: process.env.LLM_BASE_URL,
-    apiKey: process.env.OPENAI_API_KEY || "not-needed"
-});
+// const openai = new OpenAI({
+//     baseURL: process.env.LLM_BASE_URL,
+//     apiKey: process.env.OPENAI_API_KEY || "not-needed"
+// });
 
-const actionSchema = 
-    z.object({
-        action: z.enum(["say", "move", "do nothing"]),
-        value: z.string(),
-        tone: z.enum(["natural", "fierce", "whisper"])
-    })
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY as string);
+const model = genAI.getGenerativeModel({ model: process.env.GOOGLE_GENERATIVE_AI_MODEL || "gemini-1.5-flash" });
+
+// const actionSchema = 
+//     z.object({
+//         action: z.enum(["say", "move", "do nothing"]),
+//         value: z.string(),
+//         tone: z.enum(["natural", "fierce", "whisper"])
+//     })
+
+const actionResponseSchema: Schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+        action: { type: SchemaType.STRING, enum: ["say", "move", "do nothing"] },
+        value: { type: SchemaType.STRING },
+        tone: { type: SchemaType.STRING, enum: ["natural", "fierce", "whisper"] }
+    },
+    required: ["action", "value", "tone"]
+};
 
 const processDataAndTakeAction = async (channel: string) => {
     console.log("------------------PROCESSING DATA AND TAKING ACTION------------------");
-    console.log(channel);
+    console.log("channel: ", channel);
 
     const lastAction = await ShortTermMemoriesRepository.findOne({
         where: {
@@ -47,12 +61,10 @@ const processDataAndTakeAction = async (channel: string) => {
     }
 
     try {        
-        // const res = await axios.post(`http://localhost:${process.env.THOUGHT_LAYER_PORT}/api/think/possible-actions-and-outcomes`, {
-        //     prompt: "What should I do?"
-        // });
         const res = await axios.post(`http://localhost:${process.env.THOUGHT_LAYER_PORT}/api/think/possible-actions-and-outcomes`);
-        console.log(res.data);
         const actions = res.data;
+        console.log("actions: ", actions);
+        console.log("actions?.options: ", actions?.options);
 
         const prompt = `
             You are the conscious layer of the brain.
@@ -97,20 +109,20 @@ const processDataAndTakeAction = async (channel: string) => {
             ${actions}
         `;
 
-        const actionTaken = await openai.chat.completions.create({
-            model: process.env.OPENAI_MODEL,
-            messages: [
-                { 
-                    role: "user", 
-                    content: prompt,
-                }
+        const result = await model.generateContent({
+            contents: [
+                { role: "user", parts: [{ text: prompt }] }
             ],
-            response_format: zodResponseFormat(actionSchema, "json_schema")
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: actionResponseSchema
+            }
         });
 
         console.log("------------------ACTION TAKEN------------------");
-        console.log(actionTaken.choices[0].message.content);
-        const { action, value, tone } = JSON.parse(actionTaken.choices[0].message.content);
+        const actionJson = result.response.text();
+        const { action, value, tone } = JSON.parse(actionJson);
+        console.log(action, value, tone);
 
         if (action === "say") {
             axios.post(`http://localhost:${process.env.MOTOR_FUNCTIONS_LAYER_PORT}/api/speech`, {text: value, tone: tone.toLowerCase()});

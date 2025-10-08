@@ -1,7 +1,8 @@
-import OpenAI              from "openai";
+// import OpenAI              from "openai";
+import {GoogleGenerativeAI, SchemaType, Schema} from "@google/generative-ai";
 import axios               from "axios";
-import {z}                 from "zod";
-import {zodResponseFormat} from "openai/helpers/zod";
+// import {z}                 from "zod";
+// import {zodResponseFormat} from "openai/helpers/zod";
 import {DB}                from "../config/database";
 import {Vitals}            from "../entities/Vitals";
 import {Context}           from "../entities/Context";
@@ -15,19 +16,30 @@ const contextRepository           = DB.getRepository(Context);
 
 require("dotenv").config({ path: '../.env' });
 
-const openai = new OpenAI({
-    baseURL: process.env.LLM_BASE_URL,
-    apiKey: process.env.OPENAI_API_KEY || "not-needed"
-});
+// const openai = new OpenAI({
+//     baseURL: process.env.LLM_BASE_URL,
+//     apiKey: process.env.OPENAI_API_KEY || "not-needed"
+// });
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY as string);
+const model = genAI.getGenerativeModel({ model: process.env.GOOGLE_GENERATIVE_AI_MODEL || "gemini-1.5-flash" });
 
 export const MemoriesService = {
     processAction: async (action: string, type: string) => {
         try {
-            const longTermMemorySchema = z.object({
-                saveInLongTermMemory: z.boolean(),
-                memory: z.string(),
-                levelOfImportance: z.number().min(1).max(3),
-            });
+            // const longTermMemorySchema = z.object({
+            //     saveInLongTermMemory: z.boolean(),
+            //     memory: z.string(),
+            //     levelOfImportance: z.number().min(1).max(3),
+            // });
+            const responseSchema: Schema = {
+                type: SchemaType.OBJECT,
+                properties: {
+                    saveInLongTermMemory: { type: SchemaType.BOOLEAN },
+                    memory: { type: SchemaType.STRING },
+                    levelOfImportance: { type: SchemaType.NUMBER }
+                },
+                required: ["saveInLongTermMemory", "memory", "levelOfImportance"]
+            };
             
             let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
             let emotions = emotionsResponse.data.sort((a: any, b: any) => a.distance - b.distance);
@@ -118,18 +130,14 @@ export const MemoriesService = {
                 Latest Action: ${action}
             `;
             
-            const response = await openai.chat.completions.create({
-                model: process.env.OPENAI_MODEL,
-                messages: [
-                    { 
-                        role: "user", 
-                        content: prompt,
-                    }
-                ],
-                response_format: zodResponseFormat(longTermMemorySchema, "json_schema")
+            const response = await model.generateContent({
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema
+                }
             });
-            
-            const { saveInLongTermMemory, memory, levelOfImportance } = JSON.parse(response.choices[0].message.content);
+            const { saveInLongTermMemory, memory, levelOfImportance } = JSON.parse(response.response.text());
             console.log(saveInLongTermMemory, memory, levelOfImportance);
 
             let longTermMemory;

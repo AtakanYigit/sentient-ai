@@ -1,8 +1,8 @@
-import OpenAI                   from "openai";
+// import OpenAI                   from "openai";
 import {GoogleGenerativeAI}     from "@google/generative-ai";
 import axios                    from "axios";
-import {z}                      from "zod";
-import {zodResponseFormat}      from "openai/helpers/zod";
+// import {z}                      from "zod";
+// import {zodResponseFormat}      from "openai/helpers/zod";
 import {DB}                     from "../config/database";
 import sendActionToMemoryLayer  from "../utils/sendActionTomemoryLayer";
 import {ShortTermMemories}      from "../entities/ShortTermMemories";
@@ -13,13 +13,13 @@ require("dotenv").config({ path: '../.env' });
 // const contextRepository = DB.getRepository(Context);
 const shortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 
-const openai = new OpenAI({
-    baseURL: process.env.LLM_BASE_URL,
-    apiKey: process.env.OPENAI_API_KEY || "not-needed"
-});
+// const openai = new OpenAI({
+//     baseURL: process.env.LLM_BASE_URL,
+//     apiKey: process.env.OPENAI_API_KEY || "not-needed"
+// });
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY);
-const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"});
+const model = genAI.getGenerativeModel({model: process.env.GOOGLE_GENERATIVE_AI_MODEL || "gemini-1.5-flash"});
 
 export const SensesService = {
     seeAndProcess: async (file: Express.Multer.File) => {
@@ -51,41 +51,16 @@ export const SensesService = {
             `;
                 // Context: ${context?.context}.
             
-            let vision;
-            try {
-                const result = await openai.chat.completions.create({
-                    model: process.env.OPENAI_MODEL,
-                    messages: [{ 
-                        role: "user", 
-                        content: [
-                            {
-                                type: "text",
-                                text: prompt
-                            },
-                            {
-                                type: "image_url",
-                                image_url: {
-                                    url: `data:image/jpeg;base64,${base64Image}`
-                                }
-                            }
-                        ]
-                    }],
-                    response_format: zodResponseFormat(z.string(), "json_schema")
-                });
-
-                vision = result.choices[0].message.content;
-            }catch(error){
-                const result = await model.generateContent([
-                    {
-                        inlineData:{
-                            data: base64Image,
-                            mimeType: "image/jpeg"
-                        }
-                    },
-                    prompt
-                ]);
-                vision = result.response.text();
-            }
+            const result = await model.generateContent([
+                {
+                    inlineData:{
+                        data: base64Image,
+                        mimeType: "image/jpeg"
+                    }
+                },
+                prompt
+            ]);
+            let vision = result.response.text();
 
             if(vision) {
                 vision = vision.replace("Here's a description of the image:", "");

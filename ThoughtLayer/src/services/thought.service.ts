@@ -1,8 +1,9 @@
-import OpenAI              from "openai";
+// import OpenAI              from "openai";
+import {GoogleGenerativeAI, SchemaType, Schema} from "@google/generative-ai";
 import axios               from "axios";
 import {DB}                from "../../src/config/database";
-import {z}                 from "zod";
-import {zodResponseFormat} from "openai/helpers/zod";
+// import {z}                 from "zod";
+// import {zodResponseFormat} from "openai/helpers/zod";
 import {Context}           from "../entities/Context";
 import {Vitals}            from "../entities/Vitals";
 import {ShortTermMemories} from "../entities/ShortTermMemories";
@@ -14,10 +15,8 @@ const ShortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 export const ThoughtService = {
     think: async ({recievedPrompt, answerLength = "Short", context = "No context provided"}: {recievedPrompt: string, answerLength: string, context: string}) => {
         try {
-            const openai = new OpenAI({
-                baseURL: process.env.LLM_BASE_URL,
-                apiKey: process.env.OPENAI_API_KEY || "not-needed"
-            });
+            const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY as string);
+            const model = genAI.getGenerativeModel({ model: process.env.GOOGLE_GENERATIVE_AI_MODEL || "gemini-1.5-flash" });
 
             let emotionsResponse = await axios.get(`http://localhost:${process.env.EMOTIONS_LAYER_PORT}/api/emotions`);
             let emotions = emotionsResponse.data.sort((a: any, b: any) => a.distance - b.distance);
@@ -60,14 +59,8 @@ export const ThoughtService = {
                 Prompt you need to answer: ${recievedPrompt}
             `;
 
-            const response = await openai.chat.completions.create({
-                model: process.env.OPENAI_MODEL,
-                messages: [
-                    { role: "user", content: prompt }
-                ]
-            });
-
-            let cleanResponse = response.choices[0].message?.content
+            const response = await model.generateContent(prompt);
+            let cleanResponse = response.response.text()
                 .replace(/<think>[\s\S]*?<\/think>\n*/g, '')
                 
             const lastThinkIndex = cleanResponse.lastIndexOf("</think>");
@@ -84,10 +77,8 @@ export const ThoughtService = {
     },
     possibleActionsAndOutcomes: async ({recievedPrompt = "No extra command provided."}: {recievedPrompt: string}) => {
         try {
-            const openai = new OpenAI({
-                baseURL: process.env.LLM_BASE_URL,
-                apiKey: process.env.OPENAI_API_KEY || "not-needed"
-            });
+            const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY as string);
+            const model = genAI.getGenerativeModel({ model: process.env.GOOGLE_GENERATIVE_AI_MODEL || "gemini-1.5-flash" });
 
             // Fetch all data in parallel with error handling for each promise
             const fetchWithFallback = async (promise: Promise<any>, defaultValue: any) => {
@@ -138,15 +129,33 @@ export const ThoughtService = {
     
             let emotions = emotionsResponse?.data?.sort((a: any, b: any) => a.distance - b.distance).slice(0, 3);
 
-            const schema = z.object({
-                options: z.array(z.object({
-                    option: z.string(),
-                    results: z.array(z.object({
-                        result: z.string(),
-                        probability: z.number()
-                    }))
-                }))
-            });
+            const responseSchema: Schema = {
+                type: SchemaType.OBJECT,
+                properties: {
+                    options: {
+                        type: SchemaType.ARRAY,
+                        items: {
+                            type: SchemaType.OBJECT,
+                            properties: {
+                                option: { type: SchemaType.STRING },
+                                results: {
+                                    type: SchemaType.ARRAY,
+                                    items: {
+                                        type: SchemaType.OBJECT,
+                                        properties: {
+                                            result: { type: SchemaType.STRING },
+                                            probability: { type: SchemaType.NUMBER }
+                                        },
+                                        required: ["result", "probability"]
+                                    }
+                                }
+                            },
+                            required: ["option", "results"]
+                        }
+                    }
+                },
+                required: ["options"]
+            };
 
             const prompt = `
                 You are the thinking layer of the brain and other layers are providing you with:
@@ -232,18 +241,15 @@ export const ThoughtService = {
                 Extra Command: ${recievedPrompt}
             `;
 
-            const response = await openai.chat.completions.create({
-                model: process.env.OPENAI_MODEL,
-                messages: [
-                    { 
-                        role: "user", 
-                        content: prompt,
-                    }
-                ],
-                response_format: zodResponseFormat(schema, "json_schema")
+            const response = await model.generateContent({
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema
+                }
             });
 
-            const jsonResponse = JSON.parse(response.choices[0].message.content);
+            const jsonResponse = JSON.parse(response.response.text());
 
             return { success: true, response: jsonResponse };
         } catch (error) {

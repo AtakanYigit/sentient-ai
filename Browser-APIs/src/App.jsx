@@ -129,7 +129,7 @@ const App = () => {
         videoRef.current.addEventListener("playing", handleVideoPlay);
         
         // Set up interval for captures
-        const photoCaptureInterval = setInterval(captureAndSend, PHOTO_CAPTURE_INTERVAL); // 30 seconds
+        const photoCaptureInterval = setInterval(captureAndSend, PHOTO_CAPTURE_INTERVAL); 
         captureAndSend();
 
         return () => {

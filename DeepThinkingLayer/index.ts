@@ -1,4 +1,5 @@
-import {OpenAI}            from "openai";
+// import {OpenAI}            from "openai";
+import {GoogleGenerativeAI} from "@google/generative-ai";
 import {DB}                from "./config/database";
 import {Context}           from "./src/entities/Context";
 import {Vitals}            from "./src/entities/Vitals";
@@ -11,12 +12,12 @@ const shortTermMemoriesRepository = DB.getRepository(ShortTermMemories);
 
 require("dotenv").config({ path: '../.env' });
 
-console.log("Deep Thinking Layer Started");
-
-const openai = new OpenAI({
-    baseURL: process.env.LLM_BASE_URL,
-    apiKey: process.env.OPENAI_API_KEY || "not-needed"
-});
+// const openai = new OpenAI({
+//     baseURL: process.env.LLM_BASE_URL,
+//     apiKey: process.env.OPENAI_API_KEY || "not-needed"
+// });
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_KEY as string);
+const model = genAI.getGenerativeModel({ model: process.env.GOOGLE_GENERATIVE_AI_MODEL || "gemini-1.5-flash" });
 
 const fetchAndProcessContext = async () => {
     try {
@@ -113,22 +114,17 @@ const fetchAndProcessContext = async () => {
 
         // console.log(prompt);
 
-        const response = await openai.chat.completions.create({
-            model: process.env.OPENAI_MODEL,
-            messages: [{ role: "user", content: prompt.trim() }],
-        });
+        const response = await model.generateContent(prompt.trim());
+        const text = response.response.text();
 
-        if(response?.choices[0]?.message?.content) {
+        if(text) {
             const newContext = new Context();
-            newContext.context = response.choices[0].message.content;
+            newContext.context = text;
             await contextRepository.save(newContext);
 
-            console.log("API Response:", response.choices[0].message.content);
+            console.log("API Response:", text);
         } else {
-            console.error("No response from OpenAI in DeepThinkingLayer/index.ts:");
-            if(process.env.DEBUG === "ON") {
-                console.error(response);
-            }
+            console.error("No response from Google Generative AI in DeepThinkingLayer/index.ts:");
         }
     } catch (error) {
         console.error("Error in context processing in DeepThinkingLayer/index.ts:");
@@ -166,7 +162,7 @@ const init = async () => {
         }
         
         fetchAndProcessContext();
-        setInterval(fetchAndProcessContext, parseInt(process.env.DEEP_THINKING_LAYER_INTERVAL));
+        setInterval(fetchAndProcessContext, parseInt(process.env.DEEP_THINKING_LAYER_INTERVAL) || 30000);
     } catch (error) {
         console.error("Error initializing database in DeepThinkingLayer/index.ts:");
         if(process.env.DEBUG === "ON") {
